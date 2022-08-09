@@ -124,6 +124,7 @@ function FUNC_get_nbr_tasks(){
 
 }
 
+
 # << parse argument >>
 
 if [[ $# -ne 0 ]]; then
@@ -132,11 +133,20 @@ fi
 
 # << variable setting >>
 
+sh_pid="$$"
 time=${time:-1}
 period=${period:-1}
 output_dir=${output_dir:-"./output"}
 
 # <<< main >>>
+
+# calculate total times that shot the process state
+total_count=$(expr ${time} \* 60 / ${period})
+residual=$(expr ${time} \* 60 % ${period})
+
+if [[ $residual -ne 0 ]];then
+    total_count=$(expr ${total_count} + 1)
+fi
 
 # create a output folder
 if [[ -d ${output_dir} ]]; then
@@ -154,20 +164,22 @@ touch ${output_dir}/log.txt
 echo "touch ${output_dir}/log.txt"
 
 {
-printf "%s,%s,\n" "time" "${time}"
-printf "%s,%s,\n" "period" "${period}"
+printf "%s,%s\n"  "pid"         "${sh_pid}"
+printf "%s,%s,\n" "time"        "${time} hr"
+printf "%s,%s,\n" "period"      "${period} min"
+printf "%s,%s,\n" "total count" "${total_count} times"
 } > ${output_dir}/log.txt
 
 # show information
 count=0
-while  [ ${count} -lt 10 ]
+while  [ ${count} -lt ${total_count} ]
 do
     # 
     sleep 1
-    {
-    echo "count = $count"
-    } >> ${output_dir}/log.txt
     count=$(expr ${count} + 1)
+    {
+    printf "%s,%s\n" "count" "${count}/${total_count}"
+    } >> ${output_dir}/log.txt
 
     # get information
     for proc in $(ls -d /proc/[0-9]*)
@@ -177,34 +189,34 @@ do
     		continue
     	fi
 	
-	# get process information     	
+	    # get process information     	
     	pid="${proc##*/}"
     	nbr_fds="$(FUNC_get_nbr_fds ${proc})"
     	nbr_tasks="$(FUNC_get_nbr_tasks ${proc})"
 		
-	# create/append pid file 
-	if [[ ! -f ${output_dir}/${pid}.csv ]];then
-		
-		# get process information
-	    	cmdline="$(FUNC_get_cmdline ${proc})"
-       	 	exe="$(FUNC_get_exe ${proc})"
-       	 	
-       	 	# create a blank csv file
-		touch "${output_dir}/${pid}.csv"
-		
-		# append header to csv file
-		{
-		printf "%s,%s,\n" "pid" ${pid} 
-		printf "%s,%s,\n" "exe" ${exe}
-		printf "%s,%s,\n" "cmd"	${cmdline}		
-		printf "%s,%s,%s,\n" "date" "time" "nbr_of_fds" 
-		} >> "${output_dir}/${pid}.csv"
-	else
-		# append cotent to csv file
-		printf "%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${nbr_fds}" >> "${output_dir}/${pid}.csv"
-	fi
+	    # create/append pid file 
+	    if [[ ! -f ${output_dir}/${pid}.csv ]];then
+	    	
+	    	# get process information
+	        cmdline="$(FUNC_get_cmdline ${proc})"
+           	exe="$(FUNC_get_exe ${proc})"
+           	 	
+           	# create a blank csv file
+	    	touch "${output_dir}/${pid}.csv"
+	    	
+	    	# append header to csv file
+	    	{
+	    	printf "%s,%s,\n" "pid" ${pid} 
+	    	printf "%s,%s,\n" "exe" ${exe}
+	    	printf "%s,%s,\n" "cmd"	${cmdline}		
+	    	printf "%s,%s,%s,\n" "date" "time" "nbr_of_fds" 
+	    	} >> "${output_dir}/${pid}.csv"
+	    else
+	    	# append cotent to csv file
+	    	printf "%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${nbr_fds}" >> "${output_dir}/${pid}.csv"
+	    fi
 		
     done 
 
-done
+done &
 
