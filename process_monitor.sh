@@ -135,15 +135,13 @@ fi
 mkdir ${output_dir}
 echo "create ${output_dir}"
 
-# touch "${output_dir}/monitor_fds.csv"
-# echo "touch "${output_dir}/monitor_fds.csv""
+touch ${output_dir}/log.txt 
+echo "touch ${output_dir}/log.txt"
 
-# printf "%s,%s\n" "pid" "exe" > "${output_dir}/monitor_fds.csv" 
-
-# print header
-format="%-10s: %s\n"
-printf "${format}" "Begin"  "$(date +"%Y/%m/%d %R")"
-printf "${format}" "Period" "${period}"
+{
+printf "%s,%s,\n" "time" "${time}"
+printf "%s,%s,\n" "period" "${period}"
+} > ${output_dir}/log.txt
 
 # show information
 count=0
@@ -151,8 +149,10 @@ while  [ ${count} -lt 10 ]
 do
     # 
     sleep 1
+    {
     echo "count = $count"
-	count=$(expr ${count} + 1)
+    } >> ${output_dir}/log.txt
+    count=$(expr ${count} + 1)
 
     # get information
     for proc in $(ls -d /proc/[0-9]*)
@@ -161,25 +161,33 @@ do
     	if [[ ! -e ${proc} ]]; then
     		continue
     	fi
-    	
+	
+	# get process information     	
     	pid="${proc##*/}"
-    	cmdline="$(FUNC_get_cmdline ${proc})"
-        exe="$(FUNC_get_exe ${proc})"
     	nbr_fds="$(FUNC_get_nbr_fds ${proc})"
     	nbr_tasks="$(FUNC_get_nbr_tasks ${proc})"
 		
-		# create/append pid file 
-		if [[ ! -f ${output_dir}/${pid}.csv ]];then
-			touch "${output_dir}/${pid}.csv"
-			{
-			printf "%s,%s,\n" "pid" ${pid} 
-			printf "%s,%s,\n" "exe" ${exe}
-			printf "%s,%s,\n" "cmd"	${cmdline}		
-			printf "%s,%s,%s,\n" "date" "time" "nbr_of_fds" 
-			} > "${output_dir}/${pid}.csv"
-		else
-			printf "%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${nbr_fds}" >> "${output_dir}/${pid}.csv"
-		fi
+	# create/append pid file 
+	if [[ ! -f ${output_dir}/${pid}.csv ]];then
+		
+		# get process information
+	    	cmdline="$(FUNC_get_cmdline ${proc})"
+       	 	exe="$(FUNC_get_exe ${proc})"
+       	 	
+       	 	# create a blank csv file
+		touch "${output_dir}/${pid}.csv"
+		
+		# append header to csv file
+		{
+		printf "%s,%s,\n" "pid" ${pid} 
+		printf "%s,%s,\n" "exe" ${exe}
+		printf "%s,%s,\n" "cmd"	${cmdline}		
+		printf "%s,%s,%s,\n" "date" "time" "nbr_of_fds" 
+		} >> "${output_dir}/${pid}.csv"
+	else
+		# append cotent to csv file
+		printf "%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${nbr_fds}" >> "${output_dir}/${pid}.csv"
+	fi
 		
     done 
 
