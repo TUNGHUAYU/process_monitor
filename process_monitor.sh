@@ -29,22 +29,34 @@ function FUNC_parse_argument(){
                 
 			*)
                 if [[ -z ${target_arg} ]]; then
-                    echo "syntax error"
+                    echo "error: wrong syntax"
                     USAGE
                     exit 1
                 else
                     case "${target_arg}" in
                         time)
-                            time=${arg}
+                            if [[ ${arg} -le 0 ]]; then
+                                echo "error: illegal <time> value"
+                                USAGE
+                                exit 2
+                            else 
+                                time=${arg}
+                            fi
                             target_arg=""
 				            ;;
 
                         period)
-                            period=${arg}
+                            if [[ ${arg} -le 0 ]]; then
+                                echo "error: illegal <period> value"
+                                USAGE
+                                exit 2
+                            else 
+                                period=${arg}
+                            fi
                             target_arg=""
                             ;;
                         *)
-                            echo "syntax error"
+                            echo "error: wrong syntax"
                             USAGE
                             exit 1
                     esac
