@@ -3,7 +3,10 @@
 # << define function >>
 
 function USAGE(){
-    echo "usage"
+    echo "usage process_monitor.sh [-t, --time <time>][-p, --period <period>][-h, --help]"
+    echo ""
+    echo "<time>    : total time for monitoring process state   (uint:hr) (default: 1hr)"
+    echo "<period>  : sampling rate                             (uint:min)(default: 1min)"
 }
 
 function FUNC_parse_argument(){
