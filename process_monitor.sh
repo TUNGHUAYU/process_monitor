@@ -127,7 +127,7 @@ output_dir=${output_dir:-"./output"}
 if [[ -d ${output_dir} ]]; then
     read -p "Directory ${output_dir}/ exist! Overwrite? (y/n) " ans
     if [[ ${ans} == "y" ]] || [[ ${ans} == "yes" ]];then
-        rm -r ${output_dir}
+        rm -rf ${output_dir}
         echo "remove ${output_dir}"
     fi
 fi
@@ -135,10 +135,10 @@ fi
 mkdir ${output_dir}
 echo "create ${output_dir}"
 
-touch "${output_dir}/monitor_fds.csv"
-echo "touch "${output_dir}/monitor_fds.csv""
+# touch "${output_dir}/monitor_fds.csv"
+# echo "touch "${output_dir}/monitor_fds.csv""
 
-printf "%s,%s\n" "pid" "exe" > "${output_dir}/monitor_fds.csv" 
+# printf "%s,%s\n" "pid" "exe" > "${output_dir}/monitor_fds.csv" 
 
 # print header
 format="%-10s: %s\n"
@@ -147,7 +147,7 @@ printf "${format}" "Period" "${period}"
 
 # show information
 count=0
-while  [ ${count} -lt 1 ]
+while  [ ${count} -lt 10 ]
 do
     # 
     sleep 1
@@ -162,97 +162,26 @@ do
     		continue
     	fi
     	
-    	pid_array="${pid_array} ${proc##*/}"
-    	cmdline_array="${cmdline_array} $(FUNC_get_cmdline ${proc})"
-        exe_array="${exe_array} $(FUNC_get_exe ${proc})"
-    	nbr_fds_array="${nbr_fds_array} $(FUNC_get_nbr_fds ${proc})"
-    	nbr_tasks_array="${nbr_tasks_array} $(FUNC_get_nbr_tasks ${proc})"
-
+    	pid="${proc##*/}"
+    	cmdline="$(FUNC_get_cmdline ${proc})"
+        exe="$(FUNC_get_exe ${proc})"
+    	nbr_fds="$(FUNC_get_nbr_fds ${proc})"
+    	nbr_tasks="$(FUNC_get_nbr_tasks ${proc})"
+		
+		# create/append pid file 
+		if [[ ! -f ${output_dir}/${pid}.csv ]];then
+			touch "${output_dir}/${pid}.csv"
+			{
+			printf "%s,%s,\n" "pid" ${pid} 
+			printf "%s,%s,\n" "exe" ${exe}
+			printf "%s,%s,\n" "cmd"	${cmdline}		
+			printf "%s,%s,%s,\n" "date" "time" "nbr_of_fds" 
+			} > "${output_dir}/${pid}.csv"
+		else
+			printf "%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${nbr_fds}" >> "${output_dir}/${pid}.csv"
+		fi
+		
     done 
-
-    
-    awk \
-    -v pid_array="${pid_array}" \
-    -v exe_array="${exe_array}" \
-    -v nbr_fds_array="${nbr_fds_array}" \
-    '
-	function my_asorti(arr, n){
-		
-		# define indeces and _arr
-		for( i=1; i<=n; i++ ){
-			indeces[i]=i
-			_arr[i]=arr[i]
-		}
-		
-		# do bubble sort
-		for( i=1; i<=n-1; i++ ){
-			for( j=1; j<=n-i; j++){
-				if ( _arr[j] > _arr[j+1] ){
-				
-					temp = indeces[j]
-					indeces[j] = indeces[j+1]
-					indeces[j+1] = temp
-					
-					temp = _arr[j]
-					_arr[j] = _arr[j+1]
-					_arr[j+1] = temp
-				}
-			}
-		}
-		
-		return indeces
-	}
-	
-    BEGIN{
-        FS=","
-        n = split(pid_array, pid_arr, " ")
-        n = split(exe_array, exe_arr, " ")
-        n = split(nbr_fds_array, nbr_fds_arr, " ")
-    }
-
-    NR==1{
-        
-        if ( NF == 2 ){
-           header = sprintf("%s,%s\n", $0, 0)
-        } else {
-           header = sprintf("%s,%s\n", $0, $NF + 1)
-        }
-		
-    }
-
-    NR>1{
-        idx = NR - 1 
-        line[idx] = $0
-    }
-
-    END{
-        print header
-			
-		format="%s"
-		
-		i=1
-		while ( i < NF+1 ){
-			format=sprintf("%s,%s", format, "%s");
-			i = i + 1
-		}
-		format=sprintf("%s\n", format);
-		
-		i=1
-		while ( i <= n ){
-			printf(format, pid_arr[i], exe_arr[i], nbr_fds_arr[i])
-			i = i+1
-		}
-		
-    }
-    ' "${output_dir}/monitor_fds.csv" #> "${output_dir}/monitor_fds.csv.temp"
-    #cp "${output_dir}/monitor_fds.csv.temp" "${output_dir}/monitor_fds.csv"
-
-    # reset array
-    unset pid_array
-    unset cmdline_array
-    unset exe_array
-    unset nbr_fds_array
-    unset nbr_tasks_array
 
 done
 
