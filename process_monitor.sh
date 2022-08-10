@@ -221,12 +221,15 @@ do
 	    	printf "%s,%s,\n" "pid" ${pid} 
 	    	printf "%s,%s,\n" "exe" ${exe}
 	    	printf "%s,%s,\n" "cmd"	"${cmdline}"		
-	    	printf "%s,%s,%s,%s,%s,\n" "date" "time" "count" "total_count" "nbr_of_fds" 
-	    	printf "%s,%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}" "${total_count}" "${nbr_fds}" 
+	    	printf "%s,%s,\n" "total count"	"${total_count}"		
+	    	printf "%s,%s,%s,%s,\n" "date" "time" "count" "nbr_of_fds" 
+	    	printf "%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}" "${nbr_fds}" 
 	    	} >> "${output_dir}/${pid}.csv"
 	    else
 	    	# append cotent to csv file
-	    	printf "%s,%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}" "${total_count}" "${nbr_fds}" >> "${output_dir}/${pid}.csv"
+            {
+	    	printf "%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}" "${nbr_fds}" 
+            } >> "${output_dir}/${pid}.csv"
 	    fi
 		
     done 
