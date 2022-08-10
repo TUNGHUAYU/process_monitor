@@ -77,8 +77,7 @@ BEGIN{
 )
 
 # define format
-
-format="%s,%s,%s,%s"
+format="%s,%s,%s,%s" # No. pid exe cmdline
 num_arr=""
 
 i=1
@@ -86,17 +85,16 @@ while [ ${i} -le ${total_count} ]
 do
     num_arr="${num_arr} $i"
     format="${format},%s"
-    echo ${format}
     i=$(expr $i + 1)
 done
 
 format="${format}\n"
-echo ${format}
 
-# header
+# header generation
 {
 printf "${format}" "No." "pid" "exe" "cmdline" ${num_arr}
 } > "${report_dir}/monitor_fd_list.csv"
+
 
 # output information
 i=1
@@ -143,4 +141,3 @@ do
 
     i=$(expr $i + 1)
 done
-
