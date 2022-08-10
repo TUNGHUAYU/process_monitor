@@ -190,7 +190,7 @@ count=0
 while  [ ${count} -lt ${total_count} ]
 do
     # 
-    sleep 1
+    sleep "${period}m"
     count=$(expr ${count} + 1)
     {
     printf "%s,%s\n" "count" "${count}/${total_count}"
