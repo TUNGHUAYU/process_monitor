@@ -3,7 +3,9 @@
 # << define function >>
 
 function USAGE(){
-    echo "usage process_monitor.sh [-t, --time <time>][-p, --period <period>][-h, --help]"
+    sh_name=${1##*/}
+
+    echo "usage ${sh_name} [-t, --time <time>][-p, --period <period>][-h, --help]"
     echo ""
     echo "<time>    : total time for monitoring process state   (uint:hr) (default: 1hr)"
     echo "<period>  : sampling rate                             (uint:min)(default: 1min)"
@@ -15,7 +17,7 @@ function FUNC_parse_argument(){
 	do
 		case "${arg}" in
 			-h | --help)
-				USAGE
+				USAGE $0 
 				exit 0
 				;;
 
@@ -30,14 +32,14 @@ function FUNC_parse_argument(){
 			*)
                 if [[ -z ${target_arg} ]]; then
                     echo "error: wrong syntax"
-                    USAGE
+                    USAGE $0
                     exit 1
                 else
                     case "${target_arg}" in
                         time)
                             if [[ ${arg} -le 0 ]]; then
                                 echo "error: illegal <time> value"
-                                USAGE
+                                USAGE $0
                                 exit 2
                             else 
                                 time=${arg}
@@ -48,7 +50,7 @@ function FUNC_parse_argument(){
                         period)
                             if [[ ${arg} -le 0 ]]; then
                                 echo "error: illegal <period> value"
-                                USAGE
+                                USAGE $0
                                 exit 2
                             else 
                                 period=${arg}
@@ -57,7 +59,7 @@ function FUNC_parse_argument(){
                             ;;
                         *)
                             echo "error: wrong syntax"
-                            USAGE
+                            USAGE $0
                             exit 1
                     esac
                 fi
