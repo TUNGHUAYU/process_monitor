@@ -185,6 +185,7 @@ printf "%s,%s,\n" "total count" "${total_count} times"
 } > ${output_dir}/log.txt
 
 # show information
+{
 count=0
 while  [ ${count} -lt ${total_count} ]
 do
@@ -236,4 +237,11 @@ do
 		
     done 
 
-done 2> "${output_dir}/error.txt" &
+done 
+
+busybox sh ./do_analyze.sh
+
+} 2> "${output_dir}/error.txt" &
+
+
+
