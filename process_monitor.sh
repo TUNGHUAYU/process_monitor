@@ -230,5 +230,4 @@ do
 		
     done 
 
-done &
-
+done 2> "${output_dir}/error.txt" &
