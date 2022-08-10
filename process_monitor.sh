@@ -75,7 +75,18 @@ function FUNC_get_cmdline(){
 	elif [[ ! -r ${cmdline_path} ]]; then
 		echo "permission_denied"
 	else
-		echo $(cat ${cmdline_path} | tr -d '\0')
+        cat ${cmdline_path} | \
+        awk \
+        '
+        BEGIN{
+            FS='\0'
+        }
+        {
+            for(i=1; i<=NF; i++){ 
+                printf("%s ", $i);
+            } 
+        }
+        '
 	fi
 
 }
@@ -208,7 +219,7 @@ do
 	    	{
 	    	printf "%s,%s,\n" "pid" ${pid} 
 	    	printf "%s,%s,\n" "exe" ${exe}
-	    	printf "%s,%s,\n" "cmd"	${cmdline}		
+	    	printf "%s,%s,\n" "cmd"	"${cmdline}"		
 	    	printf "%s,%s,%s,%s,\n" "date" "time" "count/total_count" "nbr_of_fds" 
 	    	printf "%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}/${total_count}" "${nbr_fds}" 
 	    	} >> "${output_dir}/${pid}.csv"
