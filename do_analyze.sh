@@ -77,9 +77,11 @@ BEGIN{
 )
 
 # define format
-format="%s,%s"
-i=1
+
+format="%s,%s,%s,%s"
 num_arr=""
+
+i=1
 while [ ${i} -le ${total_count} ]
 do
     num_arr="${num_arr} $i"
@@ -87,15 +89,16 @@ do
     echo ${format}
     i=$(expr $i + 1)
 done
+
 format="${format}\n"
 echo ${format}
 
 # header
 {
-printf "${format}" "No." "pid" ${num_arr}
+printf "${format}" "No." "pid" "exe" "cmdline" ${num_arr}
 } > "${report_dir}/monitor_fd_list.csv"
 
-#
+# output information
 i=1
 for file in ${sorted_files}
 do
@@ -122,6 +125,8 @@ do
     END{
         printf("%s,", number)
         printf("%s,", pid)
+        printf("%s,", exe)
+        printf("%s,", cmd)
         i=1
         while( i <= total_count ){
             if ( i in nbr_fds ){
