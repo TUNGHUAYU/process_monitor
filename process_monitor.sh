@@ -71,9 +71,9 @@ function FUNC_get_cmdline(){
 	local cmdline_path="${proc_path}/cmdline"
 	
 	if [[ ! -e ${cmdline_path} ]];then
-		echo "not_found"
+		echo "n"
 	elif [[ ! -r ${cmdline_path} ]]; then
-		echo "permission_denied"
+		echo "d"
 	else
         cat ${cmdline_path} | tr "\0" " "
         #\
@@ -98,9 +98,9 @@ function FUNC_get_exe(){
 	local exe_path="${proc_path}/exe"
 	
 	if [[ ! -e ${exe_path} ]];then
-		echo "not_found"
+		echo "n"
 	elif [[ ! -r ${exe_path} ]]; then 
-		echo "permission_denied"
+		echo "d"
 	else 
 		echo $(ls -l ${exe_path} | awk 'NF==11{print $(NF-2) $(NF-1) $(NF)} NF==9{print $NF" -> (null)"}')
 	fi
@@ -112,9 +112,9 @@ function FUNC_get_nbr_fds(){
 	local fd_path="${proc_path}/fd"
 
 	if [[ ! -e ${fd_path} ]];then
-		echo "not_found"
+		echo "n"
 	elif [[ ! -r ${fd_path} ]]; then 
-		echo "permission_denied"
+		echo "d"
 	else 
 		echo $(ls ${fd_path} | wc -w)
 	fi
@@ -127,9 +127,9 @@ function FUNC_get_nbr_tasks(){
 	local task_path="${proc_path}/task"
 
 	if [[ ! -e ${task_path} ]];then
-		echo "not_found"
+		echo "n"
 	elif [[ ! -r ${task_path} ]]; then 
-		echo "permission_denied"
+		echo "d"
 	else 
 		echo $(ls ${task_path} | wc -w)
 	fi
