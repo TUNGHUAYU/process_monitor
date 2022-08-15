@@ -78,18 +78,6 @@ function FUNC_get_cmdline(){
 		echo "d"
 	else
         cat ${cmdline_path} | tr "\0" " "
-        #\
-        #awk \
-        #'
-        #BEGIN{
-        #    FS='\0'
-        #}
-        #{
-        #    for(i=1; i<=NF; i++){ 
-        #        printf("%s ", $i);
-        #    } 
-        #}
-        #'
 	fi
 
 }
@@ -190,7 +178,6 @@ count=0
 while  [ ${count} -lt ${total_count} ]
 do
     # 
-    sleep "${period}m"
     count=$(expr ${count} + 1)
     {
     printf "%s,%s\n" "count" "${count}/${total_count}"
@@ -236,6 +223,9 @@ do
 	    fi
 		
     done 
+
+    # sleep
+    sleep "${period}m"
 
 done 
 
