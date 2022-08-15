@@ -150,7 +150,7 @@ fi
 sh_pid="$$"
 time=${time:-1}
 period=${period:-1}
-output_dir=${output_dir:-"./output"}
+output_dir=${output_dir:-"/tmp/process_monitor_outputs"}
 
 # <<< main >>>
 
