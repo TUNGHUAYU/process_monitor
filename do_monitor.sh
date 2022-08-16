@@ -135,7 +135,6 @@ fi
 
 # << variable setting >>
 
-sh_pid="$$"
 time=${time:-1}
 period=${period:-1}
 output_dir=${output_dir:-"/tmp/process_monitor_outputs"}
@@ -166,7 +165,6 @@ touch ${output_dir}/log.txt
 echo "touch ${output_dir}/log.txt"
 
 {
-printf "%s,%s\n"  "pid"         "${sh_pid}"
 printf "%s,%s,\n" "time"        "${time} hr"
 printf "%s,%s,\n" "period"      "${period} min"
 printf "%s,%s,\n" "total count" "${total_count} times"
@@ -234,4 +232,8 @@ busybox sh ./do_analyze.sh
 } 2> "${output_dir}/error.txt" &
 
 
+bg_pid=$!
 
+{
+echo ${bg_pid}
+} > ${output_dir}/pid.txt
