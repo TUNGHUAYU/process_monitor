@@ -40,7 +40,7 @@ fi
 
 
 # define directory path
-work_dir="/tmp/process_monitor_output"
+work_dir="/tmp/process_monitor_outputs"
 report_dir="${work_dir}/report"
 
 # make folder and related file

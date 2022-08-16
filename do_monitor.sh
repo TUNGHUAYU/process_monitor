@@ -227,7 +227,7 @@ do
 
 done 
 
-busybox sh ./do_analyze.sh
+sh do_analyze.sh
 
 } 2> "${output_dir}/error.txt" &
 
