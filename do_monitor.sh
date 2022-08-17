@@ -1,4 +1,4 @@
-# reference https://man7.org/linux/man-pages/man5/proc.5.html
+# reference https://github.com/TUNGHUAYU/process_monitor/tree/openwrt-package
 
 # << define function >>
 
@@ -227,7 +227,7 @@ do
 
 done 
 
-sh do_analyze.sh
+do_analyze.sh
 
 } 2> "${output_dir}/error.txt" &
 
