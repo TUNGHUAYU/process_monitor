@@ -93,12 +93,16 @@ done
 
 
 # parse "list.txt" and sort descending order
+
+printf "%-30s %-9s %20s\n" "name" "pid" "vmrss"
 {
 
 awk \
+-v number=${number} \
 '
 BEGIN{
 	n=1
+	sum=0
 }
 NR > 2{
 	name[n] = $1
@@ -130,18 +134,18 @@ END{
 		}
 	}
 	
-	for ( i=1; i<=len; i++ ){
-		printf "%-30s %-9s %-20s\n", name[ idx[i] ], pid[ idx[i] ], vmrss[ idx[i] ]
+	for ( i=1; i<=number; i++ ){
+		printf "%-30s %-9s %20s\n", name[ idx[i] ], pid[ idx[i] ], vmrss[ idx[i] ]
+		sum += vmrss[ idx[i] ]
 	}
+
+	printf "\n"
+	printf "%-40s %20s\n", "", "---------------------"
+	printf "%-40s sum %16s\n", "", sum
 }
 ' list.txt
 
-} > proc_vmrss_rank.txt
-
-# display first n-th rows
-printf "%-30s %-9s %-20s\n" "name" "pid" "vmrss"
-cat proc_vmrss_rank.txt | head -n ${number}
+}
 
 # remove "list.txt"
 rm list.txt
-rm proc_vmrss_rank.txt
