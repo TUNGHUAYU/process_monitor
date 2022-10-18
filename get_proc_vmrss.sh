@@ -1,7 +1,13 @@
 # === function implementation ===
 
 function USAGE(){
-    echo "usage: $(basename $0) [-n <n-th process>]"
+	echo ""
+    echo "usage: $(basename $0) [-n, --nth_proc <n-th process>] [-h, --help]"
+	echo "<n-th process>: the first n biggest process of memory occupied"
+	echo ""
+	echo "e.g."
+	echo "sh $(basename $0) 		# display first 3 biggest process of memory occupied"
+	echo "sh $(basename $0) -n 10 	# display first n=10 biggest process of memory occupied"
 }
 
 function FUNC_parse_argument(){
@@ -133,7 +139,9 @@ END{
 } > proc_vmrss_rank.txt
 
 # display first n-th rows
+printf "%-30s %-9s %-20s\n" "name" "pid" "vmrss"
 cat proc_vmrss_rank.txt | head -n ${number}
 
 # remove "list.txt"
 rm list.txt
+rm proc_vmrss_rank.txt
