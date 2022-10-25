@@ -1,4 +1,4 @@
-# reference https://github.com/TUNGHUAYU/process_monitor/tree/openwrt-package
+# reference https://man7.org/linux/man-pages/man5/proc.5.html
 
 # << define function >>
 
@@ -126,6 +126,20 @@ function FUNC_get_nbr_tasks(){
 
 }
 
+function FUNC_get_vmrss(){
+
+	local proc_path=$1
+	local status_path="${proc_path}/status"
+
+	if [[ ! -e ${status_path} ]];then
+		echo "n"
+	elif [[ ! -r ${status_path} ]]; then 
+		echo "d"
+	else 
+		echo $(cat ${status_path} | awk '/^VmRSS/{ print $2 }')
+	fi
+
+}
 
 # << parse argument >>
 
@@ -189,36 +203,37 @@ do
     		continue
     	fi
 	
-	    # get process information     	
-    	pid="${proc##*/}"
-    	nbr_fds="$(FUNC_get_nbr_fds ${proc})"
-    	nbr_tasks="$(FUNC_get_nbr_tasks ${proc})"
+	# get process information     	
+	pid="${proc##*/}"
+	nbr_fds="$(FUNC_get_nbr_fds ${proc})"
+	nbr_tasks="$(FUNC_get_nbr_tasks ${proc})"
+	vmrss="$(FUNC_get_vmrss ${proc})"
 		
-	    # create/append pid file 
-	    if [[ ! -f ${output_dir}/${pid}.csv ]];then
+	# create/append pid file 
+	if [[ ! -f ${output_dir}/${pid}.csv ]];then
 	    	
-	    	# get process information
-	        cmdline="$(FUNC_get_cmdline ${proc})"
-           	exe="$(FUNC_get_exe ${proc})"
+	    # get process information
+	    cmdline="$(FUNC_get_cmdline ${proc})"
+            exe="$(FUNC_get_exe ${proc})"
            	 	
-           	# create a blank csv file
-	    	touch "${output_dir}/${pid}.csv"
+            # create a blank csv file
+	    touch "${output_dir}/${pid}.csv"
 	    	
-	    	# append header to csv file
-	    	{
-	    	printf "%s,%s,\n" "pid" ${pid} 
+	    # append header to csv file
+	    {
+	        printf "%s,%s,\n" "pid" ${pid} 
 	    	printf "%s,%s,\n" "exe" ${exe}
 	    	printf "%s,%s,\n" "cmd"	"${cmdline}"		
-	    	printf "%s,%s,\n" "total count"	"${total_count}"		
-	    	printf "%s,%s,%s,%s,\n" "date" "time" "count" "nbr_of_fds" 
-	    	printf "%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}" "${nbr_fds}" 
-	    	} >> "${output_dir}/${pid}.csv"
-	    else
-	    	# append cotent to csv file
+	    	printf "%s,%s,\n" "total count"	"${total_count}"
+	    	printf "%s,%s,%s,%s,%s,%s,\n" "date" "time" "count" "nbr_of_fds" "nbr_of_tasks" "vmrss" 
+	    	printf "%s,%s,%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}" "${nbr_fds}" "${nbr_tasks}" "${vmrss}"
+	    } >> "${output_dir}/${pid}.csv"
+	else
+	    # append cotent to csv file
             {
-	    	printf "%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}" "${nbr_fds}" 
+	    	printf "%s,%s,%s,%s,%s,%s,\n" "$(date +"%D")" "$(date +"%R:%S")" "${count}" "${nbr_fds}" "${nbr_tasks}" "${vmrss}"
             } >> "${output_dir}/${pid}.csv"
-	    fi
+	fi
 		
     done 
 
