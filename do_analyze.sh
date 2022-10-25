@@ -33,6 +33,99 @@ function FUNC_sort(){
 }
 
 
+function FUNC_generate_fd_output(){
+
+    local input_path=${1}
+    local output_path=${2}
+
+    {
+
+		awk -v number=${i} \
+		'
+		BEGIN{ FS = ","}
+		$1=="pid"{ pid=$2; }
+		$1=="exe"{ exe=$2; }
+		$1=="cmd"{ cmd=$2; }
+		
+		$1=="total count"{ total_count=$2; }
+		(NR>5){
+			count = $3
+			date[ count ] = $1
+			time[ count ] = $2
+			nbr_fds[ count ] = $4
+			nbr_tasks[ count ] = $5
+			vmrss[ count ] = $6
+		}
+		
+		END{
+			printf("%s,", number)
+			printf("%s,", pid)
+			printf("%s,", exe)
+			printf("%s,", cmd)
+			i=1
+			while( i <= total_count ){
+				if ( i in nbr_fds ){
+					printf("%s,", nbr_fds[i])
+				} else {
+					printf("%s,", "-")
+				}
+				i++
+			}
+			print ""
+		}
+		' ${input_path}
+
+    } >> ${output_path}
+
+}
+
+
+function FUNC_generate_vmrss_output(){
+
+    local input_path=${1}
+    local output_path=${2}
+
+    {
+
+		awk -v number=${i} \
+		'
+		BEGIN{ FS = ","}
+		$1=="pid"{ pid=$2; }
+		$1=="exe"{ exe=$2; }
+		$1=="cmd"{ cmd=$2; }
+		
+		$1=="total count"{ total_count=$2; }
+		(NR>5){
+			count = $3
+			date[ count ] = $1
+			time[ count ] = $2
+			nbr_fds[ count ] = $4
+			nbr_tasks[ count ] = $5
+			vmrss[ count ] = $6
+		}
+		
+		END{
+			printf("%s,", number)
+			printf("%s,", pid)
+			printf("%s,", exe)
+			printf("%s,", cmd)
+			i=1
+			while( i <= total_count ){
+				if ( i in vmrss ){
+					printf("%s,", vmrss[i])
+				} else {
+					printf("%s,", "-")
+				}
+				i++
+			}
+			print ""
+		}
+		' ${input_path}
+
+    } >> ${output_path}
+
+}
+
 # << main >>
 if [[ $# -ne 0 ]];then
     FUNC_parse_argument $@
@@ -103,41 +196,8 @@ do
 
     file_path="${work_dir}/${file}"
 
-    {
-    cat ${file_path} | awk \
-    -v number=${i} \
-    '
-    BEGIN{
-        FS = ","
-    }
-    $1=="pid"{ pid=$2; }
-    $1=="exe"{ exe=$2; }
-    $1=="cmd"{ cmd=$2; }
-    $1=="total count"{ total_count=$2; }
-    (NR>5)&&(NF==5){
-        count = $3
-        date[ count ] = $1
-        time[ count ] = $2
-        nbr_fds[ count ] = $4
-    }
-    END{
-        printf("%s,", number)
-        printf("%s,", pid)
-        printf("%s,", exe)
-        printf("%s,", cmd)
-        i=1
-        while( i <= total_count ){
-            if ( i in nbr_fds ){
-                printf("%s,", nbr_fds[i])
-            } else {
-                printf("%s,", "-")
-            }
-            i++
-        }
-        print ""
-    }
-    '
-    } >> "${report_dir}/monitor_fd_list.csv" 
+    FUNC_generate_fd_output ${file_path} "${report_dir}/monitor_fd_list.csv"
+	FUNC_generate_vmrss_output ${file_path} "${report_dir}/monitor_vmrss_list.csv"
 
     i=$(expr $i + 1)
 done
