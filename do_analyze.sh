@@ -35,12 +35,35 @@ function FUNC_sort(){
 
 function FUNC_generate_fd_output(){
 
-    local input_path=${1}
-    local output_path=${2}
+	# local variables
+	local number=${1}
+    local input_path=${2}
+    local output_path=${3}
+	
+	# generate header
+	if [[ ! -e ${output_path} ]]; then
+		# generate format and number array for header
+		format="%s,%s,%s,%s" # No. pid exe cmdline
+		num_arr=""
 
+		local count=1
+		while [ ${count} -le ${total_count} ]
+		do
+			num_arr="${num_arr} $count"
+			format="${format},%s"
+			count=$(expr $count + 1)
+		done
+		
+		format="${format}\n"
+		
+		# print header and redirect to output_path
+		printf "${format}" "No." "pid" "exe" "cmdline" ${num_arr} > ${output_path}
+	fi
+
+	# cotent generation
     {
 
-		awk -v number=${i} \
+		awk -v number=${number} \
 		'
 		BEGIN{ FS = ","}
 		$1=="pid"{ pid=$2; }
@@ -82,12 +105,35 @@ function FUNC_generate_fd_output(){
 
 function FUNC_generate_vmrss_output(){
 
-    local input_path=${1}
-    local output_path=${2}
+	# local variables
+	local number=${1}
+    local input_path=${2}
+    local output_path=${3}
+	
+	# generate header
+	if [[ ! -e ${output_path} ]]; then
+		# generate format and number array for header
+		format="%s,%s,%s,%s" # No. pid exe cmdline
+		num_arr=""
 
+		local count=1
+		while [ ${count} -le ${total_count} ]
+		do
+			num_arr="${num_arr} $count"
+			format="${format},%s"
+			count=$(expr $count + 1)
+		done
+		
+		format="${format}\n"
+		
+		# print header and redirect to output_path
+		printf "${format}" "No." "pid" "exe" "cmdline" ${num_arr} > ${output_path}
+	fi
+
+	# cotent generation
     {
 
-		awk -v number=${i} \
+		awk -v number=${number} \
 		'
 		BEGIN{ FS = ","}
 		$1=="pid"{ pid=$2; }
@@ -169,35 +215,14 @@ BEGIN{
 '
 )
 
-# define format
-format="%s,%s,%s,%s" # No. pid exe cmdline
-num_arr=""
-
-i=1
-while [ ${i} -le ${total_count} ]
-do
-    num_arr="${num_arr} $i"
-    format="${format},%s"
-    i=$(expr $i + 1)
-done
-
-format="${format}\n"
-
-# header generation
-{
-printf "${format}" "No." "pid" "exe" "cmdline" ${num_arr}
-} > "${report_dir}/monitor_fd_list.csv"
-
-
 # output information
 i=1
 for file in ${sorted_files}
 do
-
     file_path="${work_dir}/${file}"
 
-    FUNC_generate_fd_output ${file_path} "${report_dir}/monitor_fd_list.csv"
-	FUNC_generate_vmrss_output ${file_path} "${report_dir}/monitor_vmrss_list.csv"
-
-    i=$(expr $i + 1)
+    FUNC_generate_fd_output ${i} ${file_path} "${report_dir}/monitor_fd_list.csv"
+	FUNC_generate_vmrss_output ${i} ${file_path} "${report_dir}/monitor_vmrss_list.csv"
+	
+	i=$(expr $i + 1)
 done
