@@ -1,3 +1,5 @@
+# TODO: design a generic function called `FUNC_generate_output ${number} ${option} ${input_path} ${output_path}`
+# TODO: compress the monitor data from target broad to host pc.
 # << define function >>
 
 function USAGE(){
@@ -31,7 +33,6 @@ function FUNC_sort(){
     
     echo $dst
 }
-
 
 function FUNC_generate_fd_output(){
 
@@ -177,7 +178,6 @@ if [[ $# -ne 0 ]];then
     FUNC_parse_argument $@
 fi
 
-
 # define directory path
 work_dir="/tmp/process_monitor_outputs"
 report_dir="${work_dir}/report"
@@ -215,7 +215,8 @@ BEGIN{
 '
 )
 
-# output information
+# generate report
+echo -e "generate report ... \c"
 i=1
 for file in ${sorted_files}
 do
@@ -226,3 +227,16 @@ do
 	
 	i=$(expr $i + 1)
 done
+echo -e "done"
+
+# compress monitor data and report 
+echo -e "compress ... \c"
+tar -czvf process_monitor_outputs.tar.gz ${work_dir} > tar.log 2>&1
+echo -e "done"
+
+# convert to Host PC
+read -p "Enter the tftp ip: "
+tftp_ip=${REPLY}
+echo -e "tftp ... \c"
+tftp -p -l process_monitor_outputs.tar.gz ${tftp_ip}
+echo -e "done"
