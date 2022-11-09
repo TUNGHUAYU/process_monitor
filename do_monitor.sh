@@ -6,7 +6,7 @@ function USAGE(){
 
     echo "usage $(basename $0) [-t, --time <time>][-p, --period <period>][-h, --help]"
     echo ""
-    echo "<time>    : time frame   	  (uint:s,m,h,d) (default: 1h)"
+    echo "<time>    : time frame      (uint:s,m,h,d) (default: 1h)"
     echo "<period>  : sampling period (uint:s,m,h,d) (default: 1m)"
 }
 
