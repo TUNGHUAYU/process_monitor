@@ -6,8 +6,8 @@ function USAGE(){
 
     echo "usage $(basename $0) [-t, --time <time>][-p, --period <period>][-h, --help]"
     echo ""
-    echo "<time>    : total time for monitoring process state   (uint:s,m,h,d) (default: 1h)"
-    echo "<period>  : sampling rate                             (uint:s,m,h,d) (default: 1m)"
+    echo "<time>    : time frame   	  (uint:s,m,h,d) (default: 1h)"
+    echo "<period>  : sampling period (uint:s,m,h,d) (default: 1m)"
 }
 
 function FUNC_parse_argument(){
